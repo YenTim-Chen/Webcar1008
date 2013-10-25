@@ -32,7 +32,7 @@ public class ShowBooks extends HttpServlet {
        * @throws IOException if an I/O error occurs
        */
       protected void processRequest(HttpServletRequest request, HttpServletResponse response)
-              throws ServletException, IOException {
+              throws ServletException, IOException {   
             ServletContext context=this.getServletContext();
             BookService bookservice = (BookService)context.getAttribute("BookService");
 
