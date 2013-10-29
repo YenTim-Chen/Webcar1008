@@ -4,7 +4,6 @@
  */
 package controller;
 
-import Service.BookService;
 import Service.UserService;
 import java.io.IOException;
 import javax.servlet.ServletContext;
@@ -14,13 +13,14 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
+import model.Userbean;
 
 /**
  *
  * @author timchen
  */
-@WebServlet(name = "ShowBooks", urlPatterns = {"/ShowBooks"})
-public class ShowBooks extends HttpServlet {
+@WebServlet(name = "Register", urlPatterns = {"/Register"})
+public class Register extends HttpServlet {
 
       /**
        * Processes requests for both HTTP
@@ -33,34 +33,32 @@ public class ShowBooks extends HttpServlet {
        * @throws IOException if an I/O error occurs
        */
       protected void processRequest(HttpServletRequest request, HttpServletResponse response)
-              throws ServletException, IOException {   
-            if(!checkLogin(request))
-            {
-            response.sendRedirect("Login.jsp");
-            }else{
+              throws ServletException, IOException {
+            String account=(String)request.getParameter("account");
+            account.trim();
+            String password=(String)request.getParameter("password");
+            password.trim();
             ServletContext context=this.getServletContext();
-            BookService bookservice = (BookService)context.getAttribute("BookService");
-            UserService uservice=(UserService)context.getAttribute("UserService");
-            System.out.println(uservice.getUser());
-            //ServletContext context = this.getServletContext();
-            HttpSession session=request.getSession();
-            session.setAttribute("books", bookservice.getBook());
-            //context.setAttribute("books", bookservice.getbook());
-            response.sendRedirect("book.jsp");
-            //request.getRequestDispatcher("book.jsp").forward(request, response);
-            }
-      }
-      
-      public Boolean checkLogin(HttpServletRequest request)
-      {
-            boolean isLogin=false;
-            HttpSession session=request.getSession();
-            if(session.getAttribute("username")!=null)
-            {
-            isLogin=true;
-            }
+            UserService userService=(UserService)context.getAttribute("UserService");
             
-      return isLogin;
+            if(userService.userRepeat(new Userbean(account,password)).isEmpty())
+            {
+            userService.addUser(new Userbean(account,password));
+            HttpSession session=request.getSession();
+                    session.setAttribute("username",account);
+            response.sendRedirect("ShowBooks");
+            
+            }else
+            {
+            response.sendRedirect("register.jsp");
+            
+            }
+                  
+            
+            
+            
+            
+          
       }
 
       // <editor-fold defaultstate="collapsed" desc="HttpServlet methods. Click on the + sign on the left to edit the code.">

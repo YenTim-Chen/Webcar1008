@@ -5,9 +5,9 @@
 package listener;
 
 import DAO.imp.BookDAOimpl;
-import DataSouce.datasouse;
+import DAO.imp.UserDAOimpl;
 import Service.BookService;
-import java.sql.Connection;
+import Service.UserService;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.sql.DataSource;
@@ -34,6 +34,7 @@ public class ContextListener implements ServletContextListener {
             
             ServletContext context=ctx.getServletContext();
             context.setAttribute("BookService",new BookService(new BookDAOimpl(datasource)));
+            context.setAttribute("UserService",new UserService(new UserDAOimpl(datasource)));
 //            ServletContext context = ctx.getServletContext();
 //            
 //            context.setAttribute("books",new Bookstore());

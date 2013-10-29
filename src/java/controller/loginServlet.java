@@ -4,8 +4,9 @@
  */
 package controller;
 
+import Service.UserService;
 import java.io.IOException;
-import java.io.PrintWriter;
+import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.Cookie;
@@ -13,6 +14,7 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
+import model.Userbean;
 
 @WebServlet(name = "loginServlet", urlPatterns = {"/loginServlet"})
 public class loginServlet extends HttpServlet {
@@ -30,18 +32,34 @@ public class loginServlet extends HttpServlet {
       protected void processRequest(HttpServletRequest request, HttpServletResponse response)
               throws ServletException, IOException {
 
-            if (!request.getParameter("username").isEmpty() && !request.getParameter("password").isEmpty()) {
+            if (!request.getParameter("loginName").isEmpty() && !request.getParameter("password").isEmpty()) {
                   //re
-                  HttpSession session = request.getSession();
-                  remember(request, response);
-                  session.setAttribute("username", request.getParameter("username"));
+//                  HttpSession session = request.getSession();
+//                  remember(request, response);
+//                  session.setAttribute("username", request.getParameter("username"));
+                  String loginName = request.getParameter("loginName");
+                  loginName.trim();
+                  String password = request.getParameter("password");
+                  password.trim();
+                  
+                  ServletContext context = this.getServletContext();
+                  UserService userservice = (UserService) context.getAttribute("UserService");
+                  Userbean userbean = new Userbean(loginName, password);
+                  
+                  if (!userservice.userRepeat(userbean).isEmpty()) {
+                              HttpSession session=request.getSession();
+                              session.setAttribute("username",loginName);
+                        response.sendRedirect("ShowBooks");
+                        return;
+                  } else {
+                        response.sendRedirect("Login.jsp");
+                        return;
+                  }
 
-                  response.sendRedirect("ShowBooks");
-                  return;
             } else {
                   request.getRequestDispatcher("Login.jsp").forward(request, response);
-                  
-                  }
+
+            }
 
 
 //                  PrintWriter out = response.getWriter();
@@ -58,12 +76,12 @@ public class loginServlet extends HttpServlet {
       public void remember(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
 
             String rememberme = request.getParameter("rememberme");
-            if (request.getParameter("rememberme")!=null  && "yes".equals(rememberme)) {
-                 Cookie cookie = new Cookie("rememberme", rememberme);
+            if (request.getParameter("rememberme") != null && "yes".equals(rememberme)) {
+                  Cookie cookie = new Cookie("rememberme", rememberme);
                   cookie.setMaxAge(300);
                   response.addCookie(cookie);
             }
-            
+
       }
 
       // <editor-fold defaultstate="collapsed" desc="HttpServlet methods. Click on the + sign on the left to edit the code.">
